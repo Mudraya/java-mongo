@@ -13,7 +13,7 @@ public class Product {
     private String id;
     private String name;
     private int price; // Price in cents
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 }
 

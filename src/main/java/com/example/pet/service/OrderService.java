@@ -1,5 +1,6 @@
 package com.example.pet.service;
 
+import com.example.pet.dto.UpdateOrderRequest;
 import com.example.pet.enums.OrderStatus;
 import com.example.pet.model.Order;
 import com.example.pet.model.OrderItem;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -71,5 +73,45 @@ public class OrderService {
         }
 
         return savedOrder;
+    }
+
+    public Order updateOrder(String id, UpdateOrderRequest request) {
+        // Fetch the existing order
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        if (optionalOrder.isEmpty()) {
+            throw new IllegalArgumentException("Order with ID " + id + " not found.");
+        }
+
+        Order existingOrder = optionalOrder.get();
+
+        // Update fields based on the request
+        if (request.getStatus() != null) {
+            try {
+                OrderStatus status = OrderStatus.valueOf(request.getStatus().toUpperCase());
+                existingOrder.setStatus(status);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid order status: " + request.getStatus() + ". Allowed values are: AWAITING_SHIPMENT, SHIPPED.");
+            }
+        }
+
+        // Save and return the updated order
+        return orderRepository.save(existingOrder);
+    }
+
+    public Order getOrderById(String id) {
+        return orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Order with ID " + id + " not found."));
+    }
+
+    public List<Order> getAllOrders(String sort) {
+        List<Order> orders = orderRepository.findAll();
+        if ("desc".equalsIgnoreCase(sort)) {
+            return orders.stream()
+                    .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                    .collect(Collectors.toList());
+        } else {
+            return orders.stream()
+                    .sorted((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()))
+                    .collect(Collectors.toList());
+        }
     }
 }
