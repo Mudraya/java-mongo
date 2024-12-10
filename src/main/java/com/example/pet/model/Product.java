@@ -1,4 +1,4 @@
-package com.example.pet.models;
+package com.example.pet.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -7,10 +7,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Data
-@Document(collection = "Orders")
-public class Order {
+@Document(collection = "Products")
+public class Product {
     @Id
     private String id;
-    private String status;
+    private String name;
+    private int price; // Price in cents
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
+
